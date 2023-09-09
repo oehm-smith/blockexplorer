@@ -12,7 +12,7 @@ export function Blocks() {
 
     const { blockNumber } = state;
     const getBlocksNew = (async () => {
-        if (state?.blocks?.length === 0) {        // DEB - Don't keep getting
+        if (state.blocks.length === 0) {        // DEB - Don't keep getting
             const blocks = [];
             try {
                 for (let i = 0; i < 10; i++) {

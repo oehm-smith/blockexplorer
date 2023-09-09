@@ -5,7 +5,12 @@ import './App.css';
 import { DispatchContext, StateContext } from './AppContext'
 import { BlockNumber } from "./BlockNumber"
 import { Blocks } from "./Blocks"
+import { AppReducer } from "./AppReducer"
+import { AppInitialState } from "./AppInitialState"
 
+// In this week's lessons we used ethers.js. Here we are using the
+// Alchemy SDK is an umbrella library with several different packages.
+//
 // You can read more about the packages here:
 //   https://docs.alchemy.com/reference/alchemy-sdk-api-surface-overview#api-surface
 
@@ -20,39 +25,8 @@ const settings = {
 const alchemy = new Alchemy(settings);
 settings.alchemy = alchemy;
 
-// In this week's lessons we used ethers.js. Here we are using the
-// Alchemy SDK is an umbrella library with several different packages.
-//
-
-const appReducer = (state, action) => {
-    switch (action.type) {
-        case 'setBlockNumber':
-            return {
-                ...state,
-                blockNumber: action.payload
-            }
-        case 'setSettings':
-            return {
-                ...state,
-                settings: action.payload
-            }
-        case 'setBlocks':
-            return {
-                ...state,
-                blocks: action.payload
-            }
-        default:
-            return state
-    }
-}
-
 function App() {
-    const initialState = {
-        blockNumber: 680,
-        settings: {'hello': 9},
-        blocks: []
-    }
-    const [state, dispatch] = useReducer(appReducer, initialState);
+    const [state, dispatch] = useReducer(AppReducer, AppInitialState);
     // const { blockNumber } = state;
 
     useEffect(() => {
@@ -76,9 +50,10 @@ function App() {
             <StateContext.Provider value={ state }>
                 <div className="wrapper">
                     <div className="box header">Header</div>
-                    <div className="box sidebar"><Blocks/></div>
-                    <div className="box sidebar2"><BlockNumber/></div>
-                    <div className="box content">Content
+                    {/*<div className="box sidebar">Not using at the moment</div>*/}
+                    <div className="box content1"><Blocks/></div>
+                    {/*<div className="box sidebar2">Not using at the moment</div>*/}
+                    <div className="box content2">Content
                         <br/> More content than we had before so this column is now quite tall.
                         <br/> More content than we had before so this column is now quite tall.
                         <br/> More content than we had before so this column is now quite tall.

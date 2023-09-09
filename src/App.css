@@ -82,23 +82,24 @@ body {
 @media only screen and (min-width: 500px)  {
   .wrapper {
 
-    grid-template-columns: 20% auto;
+    grid-template-columns: auto;
     grid-template-areas:
-    "header   header"
-    "sidebar  content"
-    "sidebar2 sidebar2"
-    "footer   footer";
+    "header"
+    "content1"
+    "content2"
+    "footer";
   }
 }
 
 @media only screen and (min-width: 600px)   {
   .wrapper {
     grid-gap: 10px;
-    grid-template-columns: 680px auto 120px;
+    grid-template-columns: auto;
     grid-template-areas:
-      "header  header  header"
-      "sidebar content sidebar2"
-      "footer  footer  footer";
+    "header"
+    "content1"
+    "content2"
+    "footer";
     max-width: 1800px;
   }
 }
@@ -121,7 +122,7 @@ body {
   color: #444;
 }
 
-.content {
+.content1, .content2 {
   background-color: #dceec4;
   color: #444;
 }

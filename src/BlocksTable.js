@@ -100,9 +100,13 @@ export function BlocksTable({ blocks }) {
 
     const columnHelper = createColumnHelper()
 
+    const succinctise = input => {
+        return input.length < 11 ? input : input.substring(0, 6) + "..." + input.substring(input.length - 6)
+    }
+
     const columns = [
         columnHelper.accessor('hash', {
-            cell: 'de hash', //info => info.getValue(),
+            cell: info => succinctise(info.getValue()),
             footer: info => info.column.id,
         }),
         columnHelper.accessor('number', {
@@ -125,7 +129,7 @@ export function BlocksTable({ blocks }) {
         }),
         columnHelper.accessor('miner', {
             header: 'miner',
-            cell: 'de miner',
+            cell: info => succinctise(info.getValue()),
             footer: info => info.column.id,
         }),
         columnHelper.accessor('transactions', {
