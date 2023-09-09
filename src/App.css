@@ -40,7 +40,7 @@
 /* Grid from https://gridbyexample.com/examples/example13/ */
 
 body {
-  margin: 40px;
+  margin: 10px;
 }
 
 .sidebar {
@@ -93,8 +93,8 @@ body {
 
 @media only screen and (min-width: 600px)   {
   .wrapper {
-    grid-gap: 20px;
-    grid-template-columns: 120px auto 120px;
+    grid-gap: 10px;
+    grid-template-columns: 480px auto 120px;
     grid-template-areas:
       "header  header  header"
       "sidebar content sidebar2"
@@ -107,7 +107,7 @@ body {
   background-color: #444;
   color: #fff;
   border-radius: 5px;
-  padding: 10px;
+  padding: 5px;
   font-size: 150%;
 }
 
@@ -124,4 +124,8 @@ body {
 .content {
   background-color: #dceec4;
   color: #444;
+}
+
+H4 {
+  margin: 5px;
 }
