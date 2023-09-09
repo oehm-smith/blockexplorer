@@ -1,5 +1,6 @@
 import { useContext } from "react"
 import { StateContext, DispatchContext } from "./AppContext"
+import { BlocksTable } from "./BlocksTable"
 
 export function Blocks() {
     const state = useContext(StateContext);
@@ -10,7 +11,7 @@ export function Blocks() {
     return (
         <>
             <h4>Latest Blocks</h4>
-            Block Number: {blockNumber}
+            <BlocksTable/>
         </>
     )
 }

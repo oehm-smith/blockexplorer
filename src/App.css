@@ -94,7 +94,7 @@ body {
 @media only screen and (min-width: 600px)   {
   .wrapper {
     grid-gap: 10px;
-    grid-template-columns: 480px auto 120px;
+    grid-template-columns: 680px auto 120px;
     grid-template-areas:
       "header  header  header"
       "sidebar content sidebar2"
@@ -108,7 +108,7 @@ body {
   color: #fff;
   border-radius: 5px;
   padding: 5px;
-  font-size: 150%;
+  font-size: 100%;
 }
 
 .header,
