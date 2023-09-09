@@ -36,6 +36,11 @@ const appReducer = (state, action) => {
                 ...state,
                 settings: action.payload
             }
+        case 'setBlocks':
+            return {
+                ...state,
+                blocks: action.payload
+            }
         default:
             return state
     }
@@ -44,7 +49,8 @@ const appReducer = (state, action) => {
 function App() {
     const initialState = {
         blockNumber: 680,
-        settings: {'hello': 9}
+        settings: {'hello': 9},
+        blocks: []
     }
     const [state, dispatch] = useReducer(appReducer, initialState);
     // const { blockNumber } = state;

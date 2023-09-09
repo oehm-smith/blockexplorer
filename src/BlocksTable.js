@@ -69,9 +69,9 @@ export function BlocksTableRender({ columns, data }) {
     )
 }
 
-export function BlocksTable() {
-    const data =
-        [
+export function BlocksTable({ blocks }) {
+    // const data = state.blocks
+    const data =     [
             {
                 firstName: 'tanner',
                 lastName: 'linsley',
@@ -101,36 +101,71 @@ export function BlocksTable() {
     const columnHelper = createColumnHelper()
 
     const columns = [
-        columnHelper.accessor('firstName', {
-            cell: info => info.getValue(),
+        columnHelper.accessor('hash', {
+            cell: 'de hash', //info => info.getValue(),
             footer: info => info.column.id,
         }),
-        columnHelper.accessor(row => row.lastName, {
-            id: 'lastName',
+        columnHelper.accessor('number', {
             cell: info => <i>{info.getValue()}</i>,
-            header: () => <span>Last Name</span>,
+            header: () => <span>number</span>,
             footer: info => info.column.id,
         }),
-        columnHelper.accessor('age', {
-            header: () => 'Age',
+        columnHelper.accessor('timestamp', {
+            header: () => 'timestamp',
             cell: info => info.renderValue(),
             footer: info => info.column.id,
         }),
-        columnHelper.accessor('visits', {
-            header: () => <span>Visits</span>,
+        columnHelper.accessor('gasLimit', {
+            header: () => <span>gasLimit</span>,
             footer: info => info.column.id,
         }),
-        columnHelper.accessor('status', {
-            header: 'Status',
+        columnHelper.accessor('gasUsed', {
+            header: 'gasUsed',
             footer: info => info.column.id,
         }),
-        columnHelper.accessor('progress', {
-            header: 'Profile Progress',
+        columnHelper.accessor('miner', {
+            header: 'miner',
+            cell: 'de miner',
+            footer: info => info.column.id,
+        }),
+        columnHelper.accessor('transactions', {
+            header: '# transactions',
+            cell: info => info.getValue()?.length,
             footer: info => info.column.id,
         }),
     ]
 
+    // const columns = [
+    //     columnHelper.accessor('firstName', {
+    //         cell: info => info.getValue(),
+    //         footer: info => info.column.id,
+    //     }),
+    //     columnHelper.accessor(row => row.lastName, {
+    //         id: 'lastName',
+    //         cell: info => <i>{info.getValue()}</i>,
+    //         header: () => <span>Last Name</span>,
+    //         footer: info => info.column.id,
+    //     }),
+    //     columnHelper.accessor('age', {
+    //         header: () => 'Age',
+    //         cell: info => info.renderValue(),
+    //         footer: info => info.column.id,
+    //     }),
+    //     columnHelper.accessor('visits', {
+    //         header: () => <span>Visits</span>,
+    //         footer: info => info.column.id,
+    //     }),
+    //     columnHelper.accessor('status', {
+    //         header: 'Status',
+    //         footer: info => info.column.id,
+    //     }),
+    //     columnHelper.accessor('progress', {
+    //         header: 'Profile Progress',
+    //         footer: info => info.column.id,
+    //     }),
+    // ]
+
     return (
-        <BlocksTableRender columns={columns} data={data}/>
+        <BlocksTableRender columns={columns} data={blocks}/>
     )
 }

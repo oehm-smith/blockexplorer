@@ -129,3 +129,36 @@ body {
 H4 {
   margin: 5px;
 }
+
+/* table */
+
+table {
+  border: 1px solid lightgray;
+}
+
+tbody {
+  border-bottom: 1px solid lightgray;
+}
+
+th {
+  border-bottom: 1px solid lightgray;
+  border-right: 1px solid lightgray;
+  padding: 2px 4px;
+}
+
+td {
+  border-right: 1px solid lightgray;
+  padding: 2px 4px;
+}
+
+td:last-child {
+  border-right: 0;
+}
+
+tfoot {
+  color: gray;
+}
+
+tfoot th {
+  font-weight: normal;
+}
