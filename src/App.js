@@ -1,5 +1,5 @@
 import { Alchemy, Network } from 'alchemy-sdk';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useReducer } from 'react';
 
 import './App.css';
 import { BlockNumber } from "./BlockNumber"
@@ -20,12 +20,33 @@ const settings = {
 //   https://docs.alchemy.com/reference/alchemy-sdk-api-surface-overview#api-surface
 const alchemy = new Alchemy(settings);
 
+// https://hswolff.com/blog/how-to-usecontext-with-usereducer/
+const StateContext = React.createContext();
+const DispatchContext = React.createContext();
+
+const appReducer = (state, action) => {
+    switch (action.type) {
+        case 'setBlockNumber':
+            return {
+                ...state,
+                blockNumber: action.payload
+            }
+        default:
+            return state
+    }
+}
+
 function App() {
-    const [blockNumber, setBlockNumber] = useState();
+    const initialState = {
+        blockNumber: null
+    }
+    const [state, dispatch] = useReducer(appReducer, initialState);
+    const { blockNumber } = state;
 
     useEffect(() => {
         async function getBlockNumber() {
-            setBlockNumber(await alchemy.core.getBlockNumber());
+            // setBlockNumber(await alchemy.core.getBlockNumber());
+            dispatch({ type: 'setBlockNumber', payload: await alchemy.core.getBlockNumber() });
         }
 
         getBlockNumber();
@@ -33,15 +54,19 @@ function App() {
 
     // return <div className="App">Block Number: {blockNumber}</div>;
     return (
-        <div className="wrapper">
-            <div class="box header">Header</div>
-            <div class="box sidebar">Sidebar</div>
-            <div class="box sidebar2"><BlockNumber blockNumber={blockNumber}/></div>
-            <div class="box content">Content
-                <br/> More content than we had before so this column is now quite tall.
-            </div>
-            <div class="box footer">Footer</div>
-        </div>
+        <DispatchContext.Provider value={dispatch}>
+            <StateContext.Provider value={state}>
+                <div className="wrapper">
+                    <div class="box header">Header</div>
+                    <div class="box sidebar">Sidebar</div>
+                    <div class="box sidebar2"><BlockNumber blockNumber={blockNumber}/></div>
+                    <div class="box content">Content
+                        <br/> More content than we had before so this column is now quite tall.
+                    </div>
+                    <div class="box footer">Footer</div>
+                </div>
+            </StateContext.Provider>
+        </DispatchContext.Provider>
     )
 }
 
