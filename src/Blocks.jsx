@@ -4,6 +4,8 @@ import { useContext } from "react"
 import { StateContext, DispatchContext } from "./AppContext"
 import { BlocksTable } from "./BlocksTable"
 
+const forceRedownload = false;
+
 export function Blocks() {
     const state = useContext(StateContext);
     const dispatch = useContext(DispatchContext);
@@ -12,15 +14,27 @@ export function Blocks() {
 
     const { blockNumber } = state;
     const getBlocksNew = (async () => {
-        if (state.blocks.length === 0) {        // DEB - Don't keep getting
+        if (forceRedownload || state.blocks.length === 0) {        // DEB - Don't keep getting
             const blocks = [];
-            try {
-                for (let i = 0; i < 10; i++) {
-                    const block = await alchemy.core.getBlock(blockNumber - i);
-                    blocks.unshift(block)
+            for (let i = 0; i < 10;) {
+                let wait = false;
+                try {
+                    if (!wait) {
+                        const block = await alchemy.core.getBlock(blockNumber - i);
+                        // only accept if it has transactions
+                        if (block.transactions.length > 0) {    // also because dummy blocks are coming through
+                            blocks.unshift(block)
+                            console.log(`accepted block #: ${blockNumber - i} w trx: ${block.transactions.length}`)
+                        } else {
+                            console.log(`NOT WANT block #: ${blockNumber - i} w trx: ${block.transactions.length}`)
+                        }
+                        i += 1;
+                    }
+                } catch (e) {
+                    console.error(`Error getting block - ${e}`)
+                    wait = true;
+                    setTimeout(() => wait=false, 1000)
                 }
-            } catch (e) {
-                throw Error(`Error getting block - ${e}`)
             }
             console.log(`getBlocks - ${JSON.stringify(blocks.map(b => ({
                 number: b.number,
