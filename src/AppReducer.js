@@ -20,6 +20,13 @@ export const AppReducer = (state, action) => {
                 ...state,
                 blockTransactions: action.payload
             }
+        case 'appendWithTransaction':
+            const transactions = state.transactions || []
+            console.log(`reducer - appendWithTransaction - index: ${action.payload.transactionIndex}`)
+            return {
+                ...state,
+                transactions: [...transactions, action.payload]
+            }
         default:
             return state
     }
