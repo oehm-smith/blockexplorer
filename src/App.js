@@ -3,10 +3,10 @@ import React, { useEffect, useReducer } from 'react';
 
 import './App.css';
 import { DispatchContext, StateContext } from './AppContext'
-import { BlockNumber } from "./BlockNumber"
 import { Blocks } from "./Blocks"
 import { AppReducer } from "./AppReducer"
 import { AppInitialState } from "./AppInitialState"
+import { Transactions } from "./Transactions"
 
 // In this week's lessons we used ethers.js. Here we are using the
 // Alchemy SDK is an umbrella library with several different packages.
@@ -29,7 +29,7 @@ function App() {
     const [state, dispatch] = useReducer(AppReducer, AppInitialState);
     // const { blockNumber } = state;
 
-    useEffect(() => {
+    useEffect(async () => {
         async function getBlockNumber() {
             // setBlockNumber(await alchemy.core.getBlockNumber());
             dispatch({ type: 'setBlockNumber', payload: await alchemy.core.getBlockNumber() });
@@ -40,8 +40,8 @@ function App() {
             dispatch({ type: 'setSettings', payload: settings });
         }
 
-        getBlockNumber();
-        setSettings();
+        await getBlockNumber();
+        await setSettings();
     }, []);
 
     // return <div className="App">Block Number: {blockNumber}</div>;
@@ -53,12 +53,7 @@ function App() {
                     {/*<div className="box sidebar">Not using at the moment</div>*/}
                     <div className="box content1"><Blocks/></div>
                     {/*<div className="box sidebar2">Not using at the moment</div>*/}
-                    <div className="box content2">Content
-                        <br/> More content than we had before so this column is now quite tall.
-                        <br/> More content than we had before so this column is now quite tall.
-                        <br/> More content than we had before so this column is now quite tall.
-                        <br/> More content than we had before so this column is now quite tall.
-                        <br/> More content than we had before so this column is now quite tall.
+                    <div className="box content2"><Transactions/>
                     </div>
                     <div className="box footer">Footer</div>
                 </div>

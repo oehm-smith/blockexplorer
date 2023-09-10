@@ -15,6 +15,11 @@ export const AppReducer = (state, action) => {
                 ...state,
                 blocks: action.payload
             }
+        case 'setBlockTransactions':
+            return {
+                ...state,
+                blockTransactions: action.payload
+            }
         default:
             return state
     }

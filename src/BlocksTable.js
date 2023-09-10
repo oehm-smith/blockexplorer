@@ -1,7 +1,11 @@
-import React from "react"
+import React, { useContext } from "react"
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import { DispatchContext, StateContext } from "./AppContext"
 
 export function BlocksTableRender({ columns, data }) {
+    const state = useContext(StateContext);
+    const dispatch = useContext(DispatchContext);
+
     const rerender = React.useReducer(() => ({}), {})[1]
 
     const table = useReactTable({
@@ -12,8 +16,8 @@ export function BlocksTableRender({ columns, data }) {
 
     const cellAlignment = (id) => {
         const items = id.split('_');
-        const name = items[items.length-1]
-        console.log(`cellAlignment: ${name}`)
+        const name = items[items.length - 1]
+        // console.log(`cellAlignment: ${name}`)
         const aligns = {
             'gasLimit': 'right',
             'gasUsed': 'right'
@@ -24,6 +28,29 @@ export function BlocksTableRender({ columns, data }) {
                 return 'Align-' + aligns[name]
             default:
                 return 'Align-left'
+        }
+    }
+
+    const hasClickHandler = id => {
+        const items = id.split('_');
+        const name = items[items.length - 1]
+        switch (name) {
+            case 'transactions':
+                return true
+            default:
+                return false
+        }
+    }
+    const onClickHandler = (cell) => {
+        const items = cell.id.split('_');
+        const name = items[items.length - 1]
+        // console.log(`onClickHandler: ${name}`)
+        switch (name) {
+            case 'transactions':
+                // console.log(` inside transactions - ${cell.getValue().length}`)
+                dispatch({type: 'setBlockTransactions', payload: cell.getValue()})
+            default:
+                return undefined
         }
     }
     /*
@@ -52,11 +79,24 @@ export function BlocksTableRender({ columns, data }) {
                 <tbody>
                     {table.getRowModel().rows.map(row => (
                         <tr key={row.id}>
-                            {row.getVisibleCells().map(cell => (
-                                <td key={cell.id} className={cellAlignment(cell.id)}>
-                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                </td>
-                            ))}
+                            {row.getVisibleCells().map(cell => {
+                                if (hasClickHandler(cell.id)) {
+                                    return (
+                                        <td key={cell.id} className={cellAlignment(cell.id)}>
+                                            <button onClick={() => onClickHandler(cell)}>
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </button>
+                                        </td>
+                                    )
+                                } else {
+                                    return (
+                                        <td key={cell.id} className={cellAlignment(cell.id)}>
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </td>
+                                    )
+
+                                }
+                            })}
                         </tr>
                     ))}
                 </tbody>
@@ -86,34 +126,6 @@ export function BlocksTableRender({ columns, data }) {
 }
 
 export function BlocksTable({ blocks }) {
-    // const data = state.blocks
-    // const data = [
-    //     {
-    //         firstName: 'tanner',
-    //         lastName: 'linsley',
-    //         age: 24,
-    //         visits: 100,
-    //         status: 'In Relationship',
-    //         progress: 50,
-    //     },
-    //     {
-    //         firstName: 'tandy',
-    //         lastName: 'miller',
-    //         age: 40,
-    //         visits: 40,
-    //         status: 'Single',
-    //         progress: 80,
-    //     },
-    //     {
-    //         firstName: 'joe',
-    //         lastName: 'dirte',
-    //         age: 45,
-    //         visits: 20,
-    //         status: 'Complicated',
-    //         progress: 10,
-    //     },
-    // ]
-
     const succinctise = input => {
         return input.length < 11 ? input : input.substring(0, 6) + "..." + input.substring(input.length - 6)
     }
@@ -170,6 +182,10 @@ export function BlocksTable({ blocks }) {
 
     const format = number => new Intl.NumberFormat().format(number)
 
+    const clickedRow = transactions => {
+        console.log(`clickedRow - transactions: ${transactions}`)
+    }
+
     const columnHelper = createColumnHelper()
 
     const columns = [
@@ -204,8 +220,14 @@ export function BlocksTable({ blocks }) {
         }),
         columnHelper.accessor('transactions', {
             header: '# transactions',
-            cell: info => info.getValue()?.length,
+            cell: info => info.getValue()?.length
+            // {
+            //     return (
+            //         <span onClick={console.log(`yep: ` + info.getValue().length)}>Frog: {info.getValue()?.length}</span>
+            //     )
+            // },
             // footer: info => info.column.id,
+
         }),
     ]
 
