@@ -10,6 +10,22 @@ export function BlocksTableRender({ columns, data }) {
         getCoreRowModel: getCoreRowModel(),
     })
 
+    const cellAlignment = (id) => {
+        const items = id.split('_');
+        const name = items[items.length-1]
+        console.log(`cellAlignment: ${name}`)
+        const aligns = {
+            'gasLimit': 'right',
+            'gasUsed': 'right'
+        }
+        switch (name) {
+            case 'gasLimit':
+            case 'gasUsed':
+                return 'Align-' + aligns[name]
+            default:
+                return 'Align-left'
+        }
+    }
     /*
       Render the UI for your table
       - react-table doesn't have UI, it's headless. We just need to put the react-table props from the Hooks, and it will do its magic automatically
@@ -37,7 +53,7 @@ export function BlocksTableRender({ columns, data }) {
                     {table.getRowModel().rows.map(row => (
                         <tr key={row.id}>
                             {row.getVisibleCells().map(cell => (
-                                <td key={cell.id}>
+                                <td key={cell.id} className={cellAlignment(cell.id)}>
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </td>
                             ))}
@@ -71,34 +87,32 @@ export function BlocksTableRender({ columns, data }) {
 
 export function BlocksTable({ blocks }) {
     // const data = state.blocks
-    const data = [
-        {
-            firstName: 'tanner',
-            lastName: 'linsley',
-            age: 24,
-            visits: 100,
-            status: 'In Relationship',
-            progress: 50,
-        },
-        {
-            firstName: 'tandy',
-            lastName: 'miller',
-            age: 40,
-            visits: 40,
-            status: 'Single',
-            progress: 80,
-        },
-        {
-            firstName: 'joe',
-            lastName: 'dirte',
-            age: 45,
-            visits: 20,
-            status: 'Complicated',
-            progress: 10,
-        },
-    ]
-
-    const columnHelper = createColumnHelper()
+    // const data = [
+    //     {
+    //         firstName: 'tanner',
+    //         lastName: 'linsley',
+    //         age: 24,
+    //         visits: 100,
+    //         status: 'In Relationship',
+    //         progress: 50,
+    //     },
+    //     {
+    //         firstName: 'tandy',
+    //         lastName: 'miller',
+    //         age: 40,
+    //         visits: 40,
+    //         status: 'Single',
+    //         progress: 80,
+    //     },
+    //     {
+    //         firstName: 'joe',
+    //         lastName: 'dirte',
+    //         age: 45,
+    //         visits: 20,
+    //         status: 'Complicated',
+    //         progress: 10,
+    //     },
+    // ]
 
     const succinctise = input => {
         return input.length < 11 ? input : input.substring(0, 6) + "..." + input.substring(input.length - 6)
@@ -154,13 +168,17 @@ export function BlocksTable({ blocks }) {
         return output.join(' ')
     }
 
+    const format = number => new Intl.NumberFormat().format(number)
+
+    const columnHelper = createColumnHelper()
+
     const columns = [
         columnHelper.accessor('hash', {
             cell: info => succinctise(info.getValue()),
             // footer: info => info.column.id,
         }),
         columnHelper.accessor('number', {
-            cell: info => <i>{info.getValue()}</i>,
+            cell: info => format(info.getValue()),
             header: () => <span>block<br/>number</span>,
             // footer: info => info.column.id,
         }),
@@ -171,10 +189,12 @@ export function BlocksTable({ blocks }) {
         }),
         columnHelper.accessor('gasLimit', {
             header: () => <span>gasLimit</span>,
+            cell: info => format(info.getValue())
             // footer: info => info.column.id,
         }),
         columnHelper.accessor('gasUsed', {
             header: 'gasUsed',
+            cell: info => format(info.getValue())
             // footer: info => info.column.id,
         }),
         columnHelper.accessor('miner', {

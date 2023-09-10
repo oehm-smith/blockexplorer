@@ -163,3 +163,11 @@ tfoot {
 tfoot th {
   font-weight: normal;
 }
+
+.Align-left {
+  text-align: left;
+}
+
+.Align-right {
+  text-align: right;
+}
