@@ -1,7 +1,8 @@
 export const AppInitialState = {
     blockNumber: undefined,
-    settings: {'hello': 9},
+    settings: {},
     blocks: [],
     transactions: [],
-    blockTransactions: []
+    blockTransactions: [],
+    maxNumberBlocks: 10     // to display
 }

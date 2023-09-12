@@ -23,8 +23,13 @@ export const AppReducer = (state, action) => {
                 blocks: [...blocks, action.payload]
             }
         case 'prependWithBlock':
-            // This is when there is on new block (and it is from a new block) - so prepend and delete the last one
-            const blocksPre = state.blocks.slice(0,-1) || []
+            // Keep the blocks list length to state.maxNumberBlocks at most
+            let blocksPre
+            if (state.blocks?.length >= state.maxNumberBlocks) {
+                blocksPre = state.blocks.slice(0, -1)
+            } else {
+                blocksPre = state.blocks  || []
+            }
             return {
                 ...state,
                 blocks: [action.payload, ...blocksPre]

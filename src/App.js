@@ -52,9 +52,9 @@ function App() {
     useEffect(() => {
         // Force updating blocks every 12 seconds
         setInterval(async () => {
-            console.log(`setInterval to getBlockNumber`)
             await getBlockNumber()
-        }, 12000)
+            // Poll for new blocks
+        }, 4000)
     }, [])
 
     // return <div className="App">Block Number: {blockNumber}</div>;
