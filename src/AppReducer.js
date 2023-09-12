@@ -41,7 +41,6 @@ export const AppReducer = (state, action) => {
             }
         case 'appendWithTransaction':
             const transactions = state.transactions || []
-            // console.log(`reducer - appendWithTransaction - index: ${action.payload.transactionIndex}`)
             return {
                 ...state,
                 transactions: [...transactions, action.payload]

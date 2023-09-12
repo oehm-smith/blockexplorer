@@ -27,11 +27,9 @@ settings.alchemy = alchemy;
 
 function App() {
     const [state, dispatch] = useReducer(AppReducer, AppInitialState);
-    // const { blockNumber } = state;
 
     async function getBlockNumber() {
         let blockNumber = 0;
-        // For some reason block number starting from 680 is being returned
         while (blockNumber < 1000000) {
             blockNumber = await alchemy.core.getBlockNumber();
         }
@@ -41,7 +39,6 @@ function App() {
     useEffect(async () => {
 
         async function setSettings() {
-            // setBlockNumber(await alchemy.core.getBlockNumber());
             dispatch({ type: 'setSettings', payload: settings });
         }
 
@@ -50,14 +47,12 @@ function App() {
     }, []);
 
     useEffect(() => {
-        // Force updating blocks every 12 seconds
         setInterval(async () => {
             await getBlockNumber()
             // Poll for new blocks
         }, 4000)
     }, [])
 
-    // return <div className="App">Block Number: {blockNumber}</div>;
     return (
         <DispatchContext.Provider value={ dispatch }>
             <StateContext.Provider value={ state }>

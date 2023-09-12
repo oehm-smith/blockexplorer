@@ -1,6 +1,7 @@
 import React, { useContext } from "react"
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import { DispatchContext, StateContext } from "./AppContext"
+import { age, numberFormat, succinctise } from "./utils"
 
 export function BlocksTableRender({ columns, data }) {
     const state = useContext(StateContext);
@@ -15,7 +16,6 @@ export function BlocksTableRender({ columns, data }) {
     const cellAlignment = (id) => {
         const items = id.split('_');
         const name = items[items.length - 1]
-        // console.log(`cellAlignment: ${name}`)
         const aligns = {
             'gasLimit': 'right',
             'gasUsed': 'right'
@@ -39,13 +39,12 @@ export function BlocksTableRender({ columns, data }) {
                 return false
         }
     }
-    const onClickHandler = (cell) => {
+    const onClickBlockTransactions = (cell) => {
         const items = cell.id.split('_');
         const name = items[items.length - 1]
-        // console.log(`onClickHandler: ${name}`)
         switch (name) {
             case 'transactions':
-                // console.log(` inside transactions - ${cell.getValue().length}`)
+                dispatch({type: 'clearTransactions'})
                 dispatch({type: 'setBlockTransactions', payload: cell.getValue()})
             default:
                 return undefined
@@ -81,7 +80,7 @@ export function BlocksTableRender({ columns, data }) {
                                 if (hasClickHandler(cell.id)) {
                                     return (
                                         <td key={cell.id} className={cellAlignment(cell.id)}>
-                                            <button onClick={() => onClickHandler(cell)}>
+                                            <button onClick={() => onClickBlockTransactions(cell)}>
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                             </button>
                                         </td>
@@ -121,62 +120,6 @@ export function BlocksTableRender({ columns, data }) {
 }
 
 export function BlocksTable({ blocks }) {
-    const succinctise = input => {
-        return input.length < 11 ? input : input.substring(0, 6) + "..." + input.substring(input.length - 6)
-    }
-
-    const age = timestamp => {
-        const floor = val => Math.floor(val);
-        const floorOut = val => floor(val).toString(10)
-
-        const now = new Date().getTime()
-        const ms = (now - (timestamp * 1000))
-        const secs = ms / 1000
-        const mins = secs / 60
-        const hours = mins / 60
-        const days = hours / 24
-        const months = days / 30.44
-        const years = days / 365.24
-        const monthsDiff = months - floor(years) * 12
-        const daysDiff = days - floor(months) * 30.44
-        const hoursDiff = hours - floor(days) * 24
-        const minsDiff = mins - floor(hours) * 60
-        const secsDiff = secs - floor(mins) * 60
-
-        const output = [];
-        const whatDone = new Map()
-
-        if (years > 1) {
-            output.push(floorOut(years) + ' years')
-            whatDone.set('years', true)
-        }
-        if (monthsDiff > 1) {
-            output.push(floorOut(monthsDiff) + ' months')
-            whatDone.set('months', true)
-        }
-        if (daysDiff > 1) {
-            output.push(floorOut(daysDiff) + ' days')
-            whatDone.set('days', true)
-        }
-        if (hoursDiff > 1) {
-            output.push(floorOut(hoursDiff) + ' hours')
-            whatDone.set('hours', true)
-        }
-        if (minsDiff > 1) { //} && whatDone.size === 0) {
-            output.push(floorOut(minsDiff) + ' mins')
-            whatDone.set('mins', true)
-        }
-        if (secsDiff > 1) { // && whatDone.size === 0) {
-            output.push(floorOut(secsDiff) + ' secs')
-            whatDone.set('secs', true)
-        }
-
-        // console.log(`x timestamp: ${timestamp} - now: ${now}, ms: ${ms}, sec: ${secs}, secsDiff: ${secsDiff}, min: ${mins}, minsDiff: ${minsDiff}, hours: ${hours} - ${output.join(', ')}`)
-        return output.join(' ')
-    }
-
-    const format = number => new Intl.NumberFormat().format(number)
-
     const clickedRow = transactions => {
         console.log(`clickedRow - transactions: ${transactions}`)
     }
@@ -186,75 +129,32 @@ export function BlocksTable({ blocks }) {
     const columns = [
         columnHelper.accessor('hash', {
             cell: info => succinctise(info.getValue()),
-            // footer: info => info.column.id,
         }),
         columnHelper.accessor('number', {
-            cell: info => format(info.getValue()),
+            cell: info => numberFormat(info.getValue()),
             header: () => <span>block<br/>number</span>,
-            // footer: info => info.column.id,
         }),
         columnHelper.accessor('timestamp', {
             header: () => 'age',
             cell: info => age(info.getValue()),
-            // footer: info => info.column.id,
         }),
         columnHelper.accessor('gasLimit', {
             header: () => <span>gasLimit</span>,
-            cell: info => format(info.getValue())
-            // footer: info => info.column.id,
+            cell: info => numberFormat(info.getValue())
         }),
         columnHelper.accessor('gasUsed', {
             header: 'gasUsed',
-            cell: info => format(info.getValue())
-            // footer: info => info.column.id,
+            cell: info => numberFormat(info.getValue())
         }),
         columnHelper.accessor('miner', {
             header: 'miner',
             cell: info => succinctise(info.getValue()),
-            // footer: info => info.column.id,
         }),
         columnHelper.accessor('transactions', {
             header: '# transactions',
             cell: info => info.getValue()?.length
-            // {
-            //     return (
-            //         <span onClick={console.log(`yep: ` + info.getValue().length)}>Frog: {info.getValue()?.length}</span>
-            //     )
-            // },
-            // footer: info => info.column.id,
-
         }),
     ]
-
-    // const columns = [
-    //     columnHelper.accessor('firstName', {
-    //         cell: info => info.getValue(),
-    //         footer: info => info.column.id,
-    //     }),
-    //     columnHelper.accessor(row => row.lastName, {
-    //         id: 'lastName',
-    //         cell: info => <i>{info.getValue()}</i>,
-    //         header: () => <span>Last Name</span>,
-    //         footer: info => info.column.id,
-    //     }),
-    //     columnHelper.accessor('age', {
-    //         header: () => 'Age',
-    //         cell: info => info.renderValue(),
-    //         footer: info => info.column.id,
-    //     }),
-    //     columnHelper.accessor('visits', {
-    //         header: () => <span>Visits</span>,
-    //         footer: info => info.column.id,
-    //     }),
-    //     columnHelper.accessor('status', {
-    //         header: 'Status',
-    //         footer: info => info.column.id,
-    //     }),
-    //     columnHelper.accessor('progress', {
-    //         header: 'Profile Progress',
-    //         footer: info => info.column.id,
-    //     }),
-    // ]
 
     return (
         <BlocksTableRender columns={columns} data={blocks}/>
