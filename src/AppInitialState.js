@@ -1,5 +1,5 @@
 export const AppInitialState = {
-    blockNumber: 680,
+    blockNumber: undefined,
     settings: {'hello': 9},
     blocks: [],
     transactions: [],
