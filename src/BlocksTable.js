@@ -6,8 +6,6 @@ export function BlocksTableRender({ columns, data }) {
     const state = useContext(StateContext);
     const dispatch = useContext(DispatchContext);
 
-    const rerender = React.useReducer(() => ({}), {})[1]
-
     const table = useReactTable({
         data,
         columns,
@@ -118,9 +116,6 @@ export function BlocksTableRender({ columns, data }) {
                 </tfoot>
             </table>
             <div className="h-4"/>
-            <button onClick={() => rerender()} className="border p-2">
-                Rerender
-            </button>
         </div>
     )
 }
