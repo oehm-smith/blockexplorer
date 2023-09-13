@@ -1,7 +1,7 @@
 import React, { useContext } from "react"
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { DispatchContext, StateContext } from "./AppContext"
-import { age, numberFormat, succinctise } from "./utils"
+import { age, hexToDecimal, numberFormat, succinctise } from "./utils"
 
 export function TransactionsTableRender({ columns, data }) {
     const state = useContext(StateContext);
@@ -18,11 +18,13 @@ export function TransactionsTableRender({ columns, data }) {
         const name = items[items.length - 1]
         const aligns = {
             'gasLimit': 'right',
-            'gasUsed': 'right'
+            'gasUsed': 'right',
+            'value': 'right'
         }
         switch (name) {
             case 'gasLimit':
             case 'gasPrice':
+            case 'value':
                 return 'Align-' + aligns[name]
             default:
                 return 'Align-left'
@@ -124,7 +126,7 @@ export function TransactionsTable({transactions}) {
 
     const columns = [
         columnHelper.accessor('hash', {
-            cell: info => info.getValue(),
+            cell: info => succinctise(info.getValue()),
         }),
         columnHelper.accessor('blockNumber', {
             cell: info => numberFormat(info.getValue()),
@@ -152,7 +154,7 @@ export function TransactionsTable({transactions}) {
         }),
         columnHelper.accessor('value', {
             header: 'value',
-            cell: info => info.getValue()._hex
+            cell: info => numberFormat(hexToDecimal(info.getValue()._hex))
         }),
     ]
 

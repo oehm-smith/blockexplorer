@@ -63,3 +63,4 @@ export const succinctise = input => {
     return input.length < 11 ? input : input.substring(0, 6) + "..." + input.substring(input.length - 6)
 }
 
+export const hexToDecimal = hex => parseInt(hex, 16)
