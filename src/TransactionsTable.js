@@ -1,16 +1,80 @@
 import React, { useContext } from "react"
-import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import {
+    createColumnHelper, flexRender, getCoreRowModel, useReactTable, PaginationState,
+    ColumnDef
+} from "@tanstack/react-table"
 import { DispatchContext, StateContext } from "./AppContext"
 import { age, hexToDecimal, numberFormat, succinctise } from "./utils"
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 
-export function TransactionsTableRender({ columns, data }) {
+/**
+ *
+ * @param options - options: {
+ *     pageIndex, pageSize
+ * }
+ * @return {Promise<{pageCount: number, rows: *}>}
+ */
+function getFetchData(data) {
+    return async function fetchData(options) {
+        // Simulate some network latency
+        // await new Promise(r => setTimeout(r, 500))
+
+        return {
+            rows: data.slice(
+                options.pageIndex * options.pageSize,
+                (options.pageIndex + 1) * options.pageSize
+            ),
+            pageCount: Math.ceil(data.length / options.pageSize),
+        }
+    }
+}
+
+const queryClient = new QueryClient()
+
+export function TransactionsTableRender({ columns, inputData }) {
     const state = useContext(StateContext);
     const dispatch = useContext(DispatchContext);
 
+    const [{ pageIndex, pageSize }, setPagination] =
+    React.useState ({
+        pageIndex: 0,
+        pageSize: 10,
+    })
+
+    const fetchDataOptions = {
+        pageIndex,
+        pageSize,
+    }
+
+    const fetchData = getFetchData(inputData)
+    const dataQuery = useQuery(
+        ['data', fetchDataOptions],
+        () => fetchData(fetchDataOptions),
+        { keepPreviousData: true }
+    )
+
+    const defaultData = React.useMemo(() => [], [])
+
+    const pagination = React.useMemo(
+        () => ({
+            pageIndex,
+            pageSize,
+        }),
+        [pageIndex, pageSize]
+    )
+
     const table = useReactTable({
-        data,
+        data: dataQuery.data?.rows ?? defaultData,
         columns,
+        pageCount: dataQuery.data?.pageCount ?? -1,
+        state: {
+            pagination,
+        },
+        onPaginationChange: setPagination,
         getCoreRowModel: getCoreRowModel(),
+        manualPagination: true,
+        // getPaginationRowModel: getPaginationRowModel(), // If only doing manual pagination, you don't need this
+        debugTable: true,
     })
 
     const cellAlignment = (id) => {
@@ -46,7 +110,7 @@ export function TransactionsTableRender({ columns, data }) {
         const name = items[items.length - 1]
         switch (name) {
             case 'transactions':
-                dispatch({type: 'setBlockTransactions', payload: cell.getValue()})
+                dispatch({ type: 'setBlockTransactions', payload: cell.getValue() })
             default:
                 return undefined
         }
@@ -115,12 +179,75 @@ export function TransactionsTableRender({ columns, data }) {
                     ))}
                 </tfoot>
             </table>
-            <div className="h-4"/>
+            <div className="h-2"/>
+            <div className="flex items-center gap-2">
+                <button
+                    className="border rounded p-1"
+                    onClick={() => table.setPageIndex(0)}
+                    disabled={!table.getCanPreviousPage()}
+                >
+                    {'<<'}
+                </button>
+                <button
+                    className="border rounded p-1"
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                >
+                    {'<'}
+                </button>
+                <button
+                    className="border rounded p-1"
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                >
+                    {'>'}
+                </button>
+                <button
+                    className="border rounded p-1"
+                    onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                    disabled={!table.getCanNextPage()}
+                >
+                    {'>>'}
+                </button>
+                <span className="flex items-center gap-1">
+          <div>Page</div>
+          <strong>
+            {table.getState().pagination.pageIndex + 1} of{' '}
+              {table.getPageCount()}
+          </strong>
+        </span>
+                <span className="flex items-center gap-1">
+          | Go to page:
+          <input
+              type="number"
+              defaultValue={table.getState().pagination.pageIndex + 1}
+              onChange={e => {
+                  const page = e.target.value ? Number(e.target.value) - 1 : 0
+                  table.setPageIndex(page)
+              }}
+              className="border p-1 rounded w-16"
+          />
+        </span>
+                <select
+                    value={table.getState().pagination.pageSize}
+                    onChange={e => {
+                        table.setPageSize(Number(e.target.value))
+                    }}
+                >
+                    {[10, 20, 30, 40, 50].map(pageSize => (
+                        <option key={pageSize} value={pageSize}>
+                            Show {pageSize}
+                        </option>
+                    ))}
+                </select>
+                {dataQuery.isFetching ? 'Loading...' : null}
+            </div>
+            <div>{table.getRowModel().rows.length} Rows</div>
         </div>
     )
 }
 
-export function TransactionsTable({transactions}) {
+export function TransactionsTable({ transactions }) {
 
     const columnHelper = createColumnHelper()
 
@@ -159,8 +286,10 @@ export function TransactionsTable({transactions}) {
     ]
 
     return (
-        <>
-            <TransactionsTableRender columns={columns} data={transactions}/>
-        </>
+        <React.StrictMode>
+            <QueryClientProvider client={queryClient}>
+                <TransactionsTableRender columns={columns} inputData={transactions}/>
+            </QueryClientProvider>
+        </React.StrictMode>
     )
 }
