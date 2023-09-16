@@ -68,27 +68,44 @@ export function TransactionsTableRender({ columns, inputData }) {
         return [item, item]
     }
 
+    /**
+     *
+     * @param options - options.transactionIndex in 0 .. state.blockTransactions.length
+     * options.pageSize and pageIndex - offset into transactionIndex
+     * @return {Promise<Awaited<*>|Awaited<*[]>>}
+     */
     const getTransaction = async (options) => {
         if (state.blockTransactions.length == 0) {
             console.log(`getTransaction - blockTransactions.length == 0`)
             return Promise.resolve([])
         }
+        let done = false;
         let wait = false;
-        // while (!wait) {
-            try {
-                if (!wait & transactionIndex < state.blockTransactions.length) {
-                    console.log(`getTransaction - lookup: ${JSON.stringify(options)} - ${state.blockTransactions[options.transactionIndex]}`)
-                    const transaction = await alchemy.transact.getTransaction(state.blockTransactions[options.transactionIndex]);
-                    // i += 1;
-                    dispatch({ type: 'appendWithTransaction', payload: transaction })
-                    setPagination({pageIndex, pageSize, transactionIndex: transactionIndex + 1})
+        const startPossibleIndex = options.pageSize * options.pageIndex;    // + options.transactionIndex
+        const endPossibleIndex = Math.min(options.pageSize * (options.pageIndex + 1), state.blockTransactions.length - 1)
+        console.log(`getTransaction - startPossibleIndex: ${startPossibleIndex}, endPossibleIndex: ${endPossibleIndex}, blockTransactions.length: ${state.blockTransactions.length}`)
+        if (options.transactionIndex >= startPossibleIndex && options.transactionIndex < endPossibleIndex) {
+            while (!done || wait) {
+                try {
+                    if (!wait) {
+                        console.log(`  getTransaction - lookup: ${JSON.stringify(options)} - ${state.blockTransactions[options.transactionIndex]}`)
+                        const transaction = await alchemy.transact.getTransaction(state.blockTransactions[options.transactionIndex]);
+                        // i += 1;
+                        dispatch({type: 'appendWithTransaction', payload: transaction})
+                        setPagination({
+                            pageIndex: options.pageIndex,
+                            pageSize: options.pageSize,
+                            transactionIndex: options.transactionIndex + 1
+                        })
+                        done = true;
+                    }
+                } catch (e) {
+                    console.error(`Error getting transaction - ${e}`)
+                    wait = true;
+                    setTimeout(() => wait = false, 1000)
                 }
-            } catch (e) {
-                console.error(`Error getting transaction - ${e}`)
-                wait = true;
-                setTimeout(() => wait = false, 1000)
             }
-        // }
+        }
         return Promise.resolve(state.transactions)
     }
 
@@ -112,7 +129,7 @@ export function TransactionsTableRender({ columns, inputData }) {
     const table = useReactTable({
         data: dataQuery.data ?? defaultData,
         columns,
-        pageCount: 99,  //dataQuery.data?.pageCount ?? -1,
+        pageCount: Math.ceil(state.blockTransactions.length % pageSize),   //dataQuery.data?.pageCount ?? -1,
         state: {
             pagination,
         },
