@@ -1,4 +1,4 @@
-import React, { useContext } from "react"
+import React, { useContext, useEffect } from "react"
 import {
     createColumnHelper, flexRender, getCoreRowModel, useReactTable, PaginationState,
     ColumnDef
@@ -6,6 +6,7 @@ import {
 import { DispatchContext, StateContext } from "./AppContext"
 import { age, hexToDecimal, numberFormat, succinctise } from "./utils"
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
+import { Alchemy } from "alchemy-sdk"
 
 /**
  *
@@ -35,23 +36,68 @@ export function TransactionsTableRender({ columns, inputData }) {
     const state = useContext(StateContext);
     const dispatch = useContext(DispatchContext);
 
-    const [{ pageIndex, pageSize }, setPagination] =
+    const alchemy = new Alchemy(state.settings);
+
+    const [{ pageIndex, pageSize, transactionIndex }, setPagination] =
     React.useState ({
         pageIndex: 0,
         pageSize: 10,
+        transactionIndex: 0
     })
+    // const [trxGenerator, setTrxGenerator] = React.useState(()=>Promise.resolve({hash:'dummy tx generated'}))
+
+    useEffect(() => {
+        console.log(`useEffect for state.blockTransactions - length: ${state.blockTransactions.length}`)
+    //     setTrxGenerator(async () => {
+    //         console.log(`getNext`)
+    //         return [await alchemy.transact.getTransaction("0x55be2d4dea9f7d324f0c64ebbd6f62281a434302076570c1db2d0283a7d92a28")]
+    //     })
+    //     // setTrxGenerator(getNext)
+    }, [state.blockTransactions])
 
     const fetchDataOptions = {
         pageIndex,
         pageSize,
+        transactionIndex,
     }
 
-    const fetchData = getFetchData(inputData)
-    const dataQuery = useQuery(
-        ['data', fetchDataOptions],
-        () => fetchData(fetchDataOptions),
-        { keepPreviousData: true }
-    )
+    // const fetchData = getFetchData(inputData)
+
+    const getSomething = async () => {
+        const item = await alchemy.transact.getTransaction("0x55be2d4dea9f7d324f0c64ebbd6f62281a434302076570c1db2d0283a7d92a28")
+        return [item, item]
+    }
+
+    const getTransaction = async (options) => {
+        if (state.blockTransactions.length == 0) {
+            console.log(`getTransaction - blockTransactions.length == 0`)
+            return Promise.resolve([])
+        }
+        let wait = false;
+        // while (!wait) {
+            try {
+                if (!wait & transactionIndex < state.blockTransactions.length) {
+                    console.log(`getTransaction - lookup: ${JSON.stringify(options)} - ${state.blockTransactions[options.transactionIndex]}`)
+                    const transaction = await alchemy.transact.getTransaction(state.blockTransactions[options.transactionIndex]);
+                    // i += 1;
+                    dispatch({ type: 'appendWithTransaction', payload: transaction })
+                    setPagination({pageIndex, pageSize, transactionIndex: transactionIndex + 1})
+                }
+            } catch (e) {
+                console.error(`Error getting transaction - ${e}`)
+                wait = true;
+                setTimeout(() => wait = false, 1000)
+            }
+        // }
+        return Promise.resolve(state.transactions)
+    }
+
+    const dataQuery = useQuery({
+        queryKey: ['data', fetchDataOptions],
+        // queryFn: () => getSomething(),    //getTransaction(fetchDataOptions),
+        queryFn: () => getTransaction(fetchDataOptions),
+        keepPreviousData: true
+    })
 
     const defaultData = React.useMemo(() => [], [])
 
@@ -64,9 +110,9 @@ export function TransactionsTableRender({ columns, inputData }) {
     )
 
     const table = useReactTable({
-        data: dataQuery.data?.rows ?? defaultData,
+        data: dataQuery.data ?? defaultData,
         columns,
-        pageCount: dataQuery.data?.pageCount ?? -1,
+        pageCount: 99,  //dataQuery.data?.pageCount ?? -1,
         state: {
             pagination,
         },
@@ -115,10 +161,24 @@ export function TransactionsTableRender({ columns, inputData }) {
                 return undefined
         }
     }
+
+    /*if (! (dataQuery.data )) {
+        return (
+            <ul><li>Nothing yet</li></ul>
+        )
+    } else {
+        return (
+            <ul>
+                {dataQuery.data.map(x => (
+                    <li key={Math.random() * 100}>{JSON.stringify(x)}</li>
+                ))}
+            </ul>
+        )
+    }*/
     /*
       Render the UI for your table
-      - react-table doesn't have UI, it's headless. We just need to put the react-table props from the Hooks, and it will do its magic automatically
-    */
+      - react-table doesn't have UI, it's headless. We just need to put the react-table props from the Hooks, and it will do its magic automatically*/
+
     return (
         <div className="p-2">
             <table>
@@ -247,7 +307,8 @@ export function TransactionsTableRender({ columns, inputData }) {
     )
 }
 
-export function TransactionsTable({ transactions }) {
+export function TransactionsTable() {   //{ transactions }) {
+    const state = useContext(StateContext);
 
     const columnHelper = createColumnHelper()
 
@@ -285,10 +346,16 @@ export function TransactionsTable({ transactions }) {
         }),
     ]
 
+    if (state.blockTransactions.length === 0) {
+        return (
+            <>NO transactions yet</>
+        )
+    }
     return (
         <React.StrictMode>
             <QueryClientProvider client={queryClient}>
-                <TransactionsTableRender columns={columns} inputData={transactions}/>
+                <TransactionsTableRender columns={columns}/>
+                {/*inputData={transactions}/>*/}
             </QueryClientProvider>
         </React.StrictMode>
     )
