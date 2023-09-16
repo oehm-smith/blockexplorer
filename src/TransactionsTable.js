@@ -81,6 +81,7 @@ export function TransactionsTableRender({ columns, inputData }) {
         }
         let done = false;
         let wait = false;
+        // const transactions = [];
         const startPossibleIndex = options.pageSize * options.pageIndex;    // + options.transactionIndex
         const endPossibleIndex = Math.min(options.pageSize * (options.pageIndex + 1), state.blockTransactions.length - 1)
         console.log(`getTransaction - startPossibleIndex: ${startPossibleIndex}, endPossibleIndex: ${endPossibleIndex}, blockTransactions.length: ${state.blockTransactions.length}`)
@@ -92,6 +93,7 @@ export function TransactionsTableRender({ columns, inputData }) {
                         const transaction = await alchemy.transact.getTransaction(state.blockTransactions[options.transactionIndex]);
                         // i += 1;
                         dispatch({type: 'appendWithTransaction', payload: transaction})
+                        // transactions.push(transaction);
                         setPagination({
                             pageIndex: options.pageIndex,
                             pageSize: options.pageSize,
@@ -179,6 +181,21 @@ export function TransactionsTableRender({ columns, inputData }) {
         }
     }
 
+    const setPageIndex = page => {
+        dispatch({ type: 'clearTransactions' })
+        table.setPageIndex(page)
+    }
+
+    const previousPage = () => {
+        dispatch({ type: 'clearTransactions' })
+        table.previousPage()
+    }
+
+    const nextPage = () => {
+        dispatch({ type: 'clearTransactions' })
+        table.nextPage()
+    }
+
     /*if (! (dataQuery.data )) {
         return (
             <ul><li>Nothing yet</li></ul>
@@ -260,7 +277,7 @@ export function TransactionsTableRender({ columns, inputData }) {
             <div className="flex items-center gap-2">
                 <button
                     className="border rounded p-1"
-                    onClick={() => table.setPageIndex(0)}
+                    onClick={() => setPageIndex(0)}
                     disabled={!table.getCanPreviousPage()}
                 >
                     {'<<'}
@@ -274,14 +291,14 @@ export function TransactionsTableRender({ columns, inputData }) {
                 </button>
                 <button
                     className="border rounded p-1"
-                    onClick={() => table.nextPage()}
+                    onClick={() => nextPage()}
                     disabled={!table.getCanNextPage()}
                 >
                     {'>'}
                 </button>
                 <button
                     className="border rounded p-1"
-                    onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                    onClick={() => setPageIndex(table.getPageCount() - 1)}
                     disabled={!table.getCanNextPage()}
                 >
                     {'>>'}
@@ -300,7 +317,8 @@ export function TransactionsTableRender({ columns, inputData }) {
               defaultValue={table.getState().pagination.pageIndex + 1}
               onChange={e => {
                   const page = e.target.value ? Number(e.target.value) - 1 : 0
-                  table.setPageIndex(page)
+                  setPageIndex(page)
+                  // table.setPageIndex()
               }}
               className="border p-1 rounded w-16"
           />
