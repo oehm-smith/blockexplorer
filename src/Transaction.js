@@ -1,7 +1,8 @@
 import React, {useContext} from "react";
 import {DispatchContext, StateContext} from "./AppContext";
-import {printHexField, succinctise} from "./utils";
+import {printEth, printHexField, succinctise} from "./utils";
 import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from "@tanstack/react-table";
+import {Utils} from "alchemy-sdk";
 
 function TransactionTableRender({columns, data}) {
     // const table = useReactTable({
@@ -35,87 +36,29 @@ function TransactionTableRender({columns, data}) {
     }
 
     return (
-        <table className="styled-table">
-            <thead>
-            <tr>
-                <th>Field</th>
-                <th>Value</th>
-            </tr>
-            </thead>
-            <tbody>
-            {data.map(d => {
-                const key = Object.keys(d)[0]
-                return (
-                    <tr key={key}>
-                        <td className="Align-right">{key}</td>
-                        <td className="Align-left">{d[key]}</td>
-                    </tr>
-                )
-            })
-            }
-            </tbody>
-        </table>
-        // <div className="p-2">
-        //     <table>
-        //         <thead>
-        //         {table.getHeaderGroups().map(headerGroup => (
-        //             <tr key={headerGroup.id}>
-        //                 {headerGroup.headers.map(header => (
-        //                     <th key={header.id}>
-        //                         {header.isPlaceholder
-        //                             ? null
-        //                             : flexRender(
-        //                                 header.column.columnDef.header,
-        //                                 header.getContext()
-        //                             )}
-        //                     </th>
-        //                 ))}
-        //             </tr>
-        //         ))}
-        //         </thead>
-        //         <tbody>
-        //         {table.getRowModel().rows.map(row => (
-        //             <tr key={row.id}>
-        //                 {row.getVisibleCells().map(cell => {
-        //                     if (hasClickHandler(cell.id)) {
-        //                         return (
-        //                             <td key={cell.id} className={cellAlignment(cell.id)}>
-        //                                 <button onClick={() => onClickField(cell)}>
-        //                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
-        //                                 </button>
-        //                             </td>
-        //                         )
-        //                     } else {
-        //                         return (
-        //                             <td key={cell.id} className={cellAlignment(cell.id)}>
-        //                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
-        //                             </td>
-        //                         )
-        //
-        //                     }
-        //                 })}
-        //             </tr>
-        //         ))}
-        //         </tbody>
-        //         <tfoot>
-        //         {table.getFooterGroups().map(footerGroup => (
-        //             <tr key={footerGroup.id}>
-        //                 {footerGroup.headers.map(header => (
-        //                     <th key={header.id}>
-        //                         {header.isPlaceholder
-        //                             ? null
-        //                             : flexRender(
-        //                                 header.column.columnDef.footer,
-        //                                 header.getContext()
-        //                             )}
-        //                     </th>
-        //                 ))}
-        //             </tr>
-        //         ))}
-        //         </tfoot>
-        //     </table>
-        //     <div className="h-4"/>
-        // </div>
+        <div>
+            <h4>Transaction</h4>
+            <table className="styled-table">
+                <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                {data.map(d => {
+                    const key = Object.keys(d)[0]
+                    return (
+                        <tr key={key}>
+                            <td className="Align-right">{key}</td>
+                            <td className="Align-left">{d[key]}</td>
+                        </tr>
+                    )
+                })
+                }
+                </tbody>
+            </table>
+        </div>
     )
 }
 
@@ -128,15 +71,15 @@ export function Transaction() {
         const data = [
             {To: tx.to},
             {From: tx.from},
-            {Value: printHexField(tx.value)},
+            {Value: printEth(tx.value)},
             {contractAddress: tx.contractAddress},
             {transactionIndex: tx.transactionIndex},
             {root: tx.root},
             {gasUsed: printHexField(tx.gasUsed)},
             {gasLimit: printHexField(tx.gasLimit)},
-            {gasPrice: printHexField(tx.gasPrice)},
-            {maxFeePerGas: printHexField(tx.maxFeePerGas)},
-            {maxPriorityFeePerGas: printHexField(tx.maxPriorityFeePerGas)},
+            {gasPrice: printEth(tx.gasPrice)},
+            {maxFeePerGas: printEth(tx.maxFeePerGas)},
+            {maxPriorityFeePerGas: printEth(tx.maxPriorityFeePerGas)},
             {logsBloom: tx.logsBloom},
             {transactionHash: tx.transactionHash},
             {logs: tx.logs},

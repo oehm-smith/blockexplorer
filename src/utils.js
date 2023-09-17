@@ -1,3 +1,5 @@
+import {Utils} from "alchemy-sdk";
+
 export const age = timestamp => {
     const floor = val => Math.floor(val);
     const floorOut = val => floor(val).toString(10)
@@ -70,4 +72,8 @@ export const printHexField = field => {
         return hexToDecimal(field._hex)
     }
     return null
+}
+
+export const printEth = (wei) => {
+    return Utils.formatEther(wei) + " Eth"
 }

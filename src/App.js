@@ -8,6 +8,7 @@ import { AppReducer } from "./AppReducer"
 import { AppInitialState } from "./AppInitialState"
 import { Transactions } from "./Transactions"
 import {Transaction} from "./Transaction";
+import {WalletLookup} from "./WalletLookup";
 
 // In this week's lessons we used ethers.js. Here we are using the
 // Alchemy SDK is an umbrella library with several different packages.
@@ -51,7 +52,7 @@ function App() {
         setInterval(async () => {
             await getBlockNumber()
             // Poll for new blocks
-        }, 4000)
+        }, 12000)
     }, [])
 
     return (
@@ -64,6 +65,7 @@ function App() {
                     {/*<div className="box sidebar2">Not using at the moment</div>*/}
                     <div className="box content2"><Transactions/></div>
                     <div className="box content3"><Transaction/></div>
+                    <div className="box content4"><WalletLookup/></div>
                     <div className="box footer">Blockscan</div>
                 </div>
             </StateContext.Provider>

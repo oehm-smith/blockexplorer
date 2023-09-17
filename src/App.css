@@ -124,7 +124,7 @@ body {
   color: #444;
 }
 
-.content1, .content2, .content3 {
+.content1, .content2, .content3, .content4 {
   background-color: #dceec4;
   color: #444;
 }
@@ -181,4 +181,24 @@ tfoot th {
   font-family: sans-serif;
   min-width: 400px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.styled-table thead tr {
+  background-color: #009879;
+  color: #ffffff;
+  text-align: left;
+}
+
+.styled-table th,
+.styled-table td {
+  padding: 5px 10px;
+}
+
+.walletLookup {
+  width: 80%;
+  border: 1px;
+}
+
+.walletLookup input {
+  width: 50%;
 }
