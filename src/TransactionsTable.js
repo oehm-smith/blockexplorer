@@ -108,6 +108,7 @@ export function TransactionsTableRender({ columns, inputData }) {
                     if (!wait) {
                         console.log(`  getTransaction - lookup: ${JSON.stringify(options)} - ${state.blockTransactions[options.transactionIndex]}`)
                         const transaction = await alchemy.transact.getTransaction(state.blockTransactions[options.transactionIndex]);
+                        transaction.transactionNumber = options.transactionIndex;
                         // i += 1;
                         dispatch({type: 'appendWithTransaction', payload: transaction})
                         // transactions.push(transaction);
@@ -387,6 +388,10 @@ export function TransactionsTable() {   //{ transactions }) {
     const columnHelper = createColumnHelper()
 
     const columns = [
+        columnHelper.accessor('transactionNumber', {
+            header: () => <span>#</span>,
+            cell: info => info.getValue(),
+        }),
         columnHelper.accessor('hash', {
             cell: info => succinctise(info.getValue()),
         }),
