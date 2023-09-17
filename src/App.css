@@ -124,7 +124,7 @@ body {
   color: #444;
 }
 
-.content1, .content2 {
+.content1, .content2, .content3 {
   background-color: #dceec4;
   color: #444;
 }
@@ -172,4 +172,13 @@ tfoot th {
 
 .Align-right {
   text-align: right;
+}
+
+.styled-table {
+  border-collapse: collapse;
+  margin: 25px 0;
+  font-size: 0.9em;
+  font-family: sans-serif;
+  min-width: 400px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
 }

@@ -1,6 +1,123 @@
 import React, {useContext} from "react";
 import {DispatchContext, StateContext} from "./AppContext";
-import {printHex, printHexField} from "./utils";
+import {printHexField, succinctise} from "./utils";
+import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from "@tanstack/react-table";
+
+function TransactionTableRender({columns, data}) {
+    // const table = useReactTable({
+    //     data,
+    //     columns,
+    //     getCoreRowModel: getCoreRowModel(),
+    // })
+
+    const hasClickHandler = () => {
+        return false;
+    }
+
+    const cellAlignment = (id) => {
+        const items = id.split('_');
+        const name = items[items.length - 1]
+        const aligns = {
+            'gasLimit': 'right',
+            'gasUsed': 'right'
+        }
+        switch (name) {
+            case 'gasLimit':
+            case 'gasUsed':
+                return 'Align-' + aligns[name]
+            default:
+                return 'Align-left'
+        }
+    }
+
+    const onClickField = (cell) => {
+        // NOP - and will never be called    
+    }
+
+    return (
+        <table className="styled-table">
+            <thead>
+            <tr>
+                <th>Field</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            {data.map(d => {
+                const key = Object.keys(d)[0]
+                return (
+                    <tr key={key}>
+                        <td className="Align-right">{key}</td>
+                        <td className="Align-left">{d[key]}</td>
+                    </tr>
+                )
+            })
+            }
+            </tbody>
+        </table>
+        // <div className="p-2">
+        //     <table>
+        //         <thead>
+        //         {table.getHeaderGroups().map(headerGroup => (
+        //             <tr key={headerGroup.id}>
+        //                 {headerGroup.headers.map(header => (
+        //                     <th key={header.id}>
+        //                         {header.isPlaceholder
+        //                             ? null
+        //                             : flexRender(
+        //                                 header.column.columnDef.header,
+        //                                 header.getContext()
+        //                             )}
+        //                     </th>
+        //                 ))}
+        //             </tr>
+        //         ))}
+        //         </thead>
+        //         <tbody>
+        //         {table.getRowModel().rows.map(row => (
+        //             <tr key={row.id}>
+        //                 {row.getVisibleCells().map(cell => {
+        //                     if (hasClickHandler(cell.id)) {
+        //                         return (
+        //                             <td key={cell.id} className={cellAlignment(cell.id)}>
+        //                                 <button onClick={() => onClickField(cell)}>
+        //                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
+        //                                 </button>
+        //                             </td>
+        //                         )
+        //                     } else {
+        //                         return (
+        //                             <td key={cell.id} className={cellAlignment(cell.id)}>
+        //                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
+        //                             </td>
+        //                         )
+        //
+        //                     }
+        //                 })}
+        //             </tr>
+        //         ))}
+        //         </tbody>
+        //         <tfoot>
+        //         {table.getFooterGroups().map(footerGroup => (
+        //             <tr key={footerGroup.id}>
+        //                 {footerGroup.headers.map(header => (
+        //                     <th key={header.id}>
+        //                         {header.isPlaceholder
+        //                             ? null
+        //                             : flexRender(
+        //                                 header.column.columnDef.footer,
+        //                                 header.getContext()
+        //                             )}
+        //                     </th>
+        //                 ))}
+        //             </tr>
+        //         ))}
+        //         </tfoot>
+        //     </table>
+        //     <div className="h-4"/>
+        // </div>
+    )
+}
 
 export function Transaction() {
     const state = useContext(StateContext);
@@ -8,34 +125,47 @@ export function Transaction() {
 
     if (state.selectedTransaction) {
         const tx = state.transactions[state.selectedTransaction]
+        const data = [
+            {To: tx.to},
+            {From: tx.from},
+            {Value: printHexField(tx.value)},
+            {contractAddress: tx.contractAddress},
+            {transactionIndex: tx.transactionIndex},
+            {root: tx.root},
+            {gasUsed: printHexField(tx.gasUsed)},
+            {gasLimit: printHexField(tx.gasLimit)},
+            {gasPrice: printHexField(tx.gasPrice)},
+            {maxFeePerGas: printHexField(tx.maxFeePerGas)},
+            {maxPriorityFeePerGas: printHexField(tx.maxPriorityFeePerGas)},
+            {logsBloom: tx.logsBloom},
+            {transactionHash: tx.transactionHash},
+            {logs: tx.logs},
+            {blockNumber: tx.blockNumber},
+            {type: tx.type},
+            {status: tx.status},
+            {cummulativeGasUsed: tx.cummulativeGasUsed},
+            {effectiveGasPrice: tx.effectiveGasPrice},
+            {confirmation: tx.confirmation},
+            {nonce: tx.nonce},
+        ]
+
+
+        const columnHelper = createColumnHelper()
+
+        const columns = [
+            columnHelper.accessor('field', {
+                cell: info => succinctise(info.getValue()),
+            }),
+            columnHelper.accessor('value', {
+                cell: info => succinctise(info.getValue()),
+            }),
+        ]
+
         return (
-            <>
-                <h4>Transaction</h4>
-                <span>Got a tx: {state.selectedTransaction}</span>
-                <p>To: {tx.to} </p>
-                <p>From: {tx.from} </p>
-                <p>Value: {printHexField(tx.value)} </p>
-                <p>contractAddress: {tx.contractAddress} </p>
-                <p>transactionIndex: {tx.transactionIndex} </p>
-                <p>root: {tx.root} </p>
-                <p>gasUsed: {printHexField(tx.gasUsed)} </p>
-                <p>gasLimit {printHexField(tx.gasLimit)} </p>
-                <p>gasPrice: {printHexField(tx.gasPrice)} </p>
-                <p>maxFeePerGas: {printHexField(tx.maxFeePerGas)} </p>
-                <p>maxPriorityFeePerGas: {printHexField(tx.maxPriorityFeePerGas)} </p>
-                <p>logsBloom: {tx.logsBloom} </p>
-                <p>transactionHash: {tx.transactionHash} </p>
-                <p>logs: {tx.logs} </p>
-                <p>blockNumber: {tx.blockNumber} </p>
-                <p>type: {tx.type} </p>
-                <p>status: {tx.status} </p>
-                <p>cummulativeGasUsed: {tx.cummulativeGasUsed} </p>
-                <p>effectiveGasPrice: {tx.effectiveGasPrice} </p>
-                <p>confirmation: {tx.confirmation} </p>
-                <p>nonce: {tx.nonce} </p>
-            </>
+            <TransactionTableRender columns={columns} data={data}/>
         )
     }
+
     return (
         <>
             <h4>Transaction</h4>
