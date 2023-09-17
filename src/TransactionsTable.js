@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react"
+import React, {useContext, useEffect, useRef} from "react"
 import {
     createColumnHelper, flexRender, getCoreRowModel, useReactTable, PaginationState,
     ColumnDef
@@ -44,6 +44,16 @@ export function TransactionsTableRender({ columns, inputData }) {
         pageSize: 10,
         transactionIndex: 0
     })
+    const pageIndexRef = useRef();  // save the previous value of pageIndex
+
+    // function usePrevious(value) {
+    //     const ref = useRef();
+    //     useEffect(() => {
+    //         ref.current = value;
+    //     });
+    //     return ref.current;
+    // }
+
     // const [trxGenerator, setTrxGenerator] = React.useState(()=>Promise.resolve({hash:'dummy tx generated'}))
 
     useEffect(() => {
@@ -68,6 +78,13 @@ export function TransactionsTableRender({ columns, inputData }) {
         return [item, item]
     }
 
+    const calculateFirstTransaction = options => {
+        return options.pageSize * options.pageIndex;    // + options.transactionIndex
+    }
+
+    const calculateLastTransaction = options => {
+        return Math.min(options.pageSize * (options.pageIndex + 1), state.blockTransactions.length - 1)
+    }
     /**
      *
      * @param options - options.transactionIndex in 0 .. state.blockTransactions.length
@@ -82,9 +99,9 @@ export function TransactionsTableRender({ columns, inputData }) {
         let done = false;
         let wait = false;
         // const transactions = [];
-        const startPossibleIndex = options.pageSize * options.pageIndex;    // + options.transactionIndex
-        const endPossibleIndex = Math.min(options.pageSize * (options.pageIndex + 1), state.blockTransactions.length - 1)
-        console.log(`getTransaction - startPossibleIndex: ${startPossibleIndex}, endPossibleIndex: ${endPossibleIndex}, blockTransactions.length: ${state.blockTransactions.length}`)
+        const startPossibleIndex = calculateFirstTransaction(options)
+        const endPossibleIndex = calculateLastTransaction(options)
+        console.log(`getTransaction - transactionIndex: ${options.transactionIndex}, startPossibleIndex: ${startPossibleIndex}, endPossibleIndex: ${endPossibleIndex}, blockTransactions.length: ${state.blockTransactions.length}`)
         if (options.transactionIndex >= startPossibleIndex && options.transactionIndex < endPossibleIndex) {
             while (!done || wait) {
                 try {
@@ -124,14 +141,15 @@ export function TransactionsTableRender({ columns, inputData }) {
         () => ({
             pageIndex,
             pageSize,
+            transactionIndex,
         }),
-        [pageIndex, pageSize]
+        [pageIndex, pageSize, transactionIndex]
     )
 
     const table = useReactTable({
         data: dataQuery.data ?? defaultData,
         columns,
-        pageCount: Math.ceil(state.blockTransactions.length % pageSize),   //dataQuery.data?.pageCount ?? -1,
+        pageCount: Math.ceil(state.blockTransactions.length / pageSize),   //dataQuery.data?.pageCount ?? -1,
         state: {
             pagination,
         },
@@ -142,6 +160,18 @@ export function TransactionsTableRender({ columns, inputData }) {
         debugTable: true,
     })
 
+    useEffect(() => {
+        console.log(`table state pagination updated: ${JSON.stringify(table.getState().pagination)}`)
+        // only want to update if the pageIndex has changed
+        if (pageIndexRef.current !== table.getState().pagination.pageIndex) {
+            const newTransactionIndex = calculateFirstTransaction(fetchDataOptions)
+            console.log(`changed transactionIndex to ${newTransactionIndex}`)
+            const updatedPagination = {...table.getState().pagination, transactionIndex: newTransactionIndex}
+            setPagination(updatedPagination)
+            pageIndexRef.current = table.getState().pagination.pageIndex
+        }
+    }, [table.getState().pagination])
+    
     const cellAlignment = (id) => {
         const items = id.split('_');
         const name = items[items.length - 1]
@@ -181,19 +211,28 @@ export function TransactionsTableRender({ columns, inputData }) {
         }
     }
 
+    const updateTransactionIndex = () => {
+        // const newTransactionIndex = calculateFirstTransaction(fetchDataOptions)
+        // const updatedOptions = {...table.getState().pagination, transactionIndex: newTransactionIndex}
+        // setPagination(updatedOptions)
+    }
+
     const setPageIndex = page => {
         dispatch({ type: 'clearTransactions' })
         table.setPageIndex(page)
+        updateTransactionIndex()
     }
 
     const previousPage = () => {
         dispatch({ type: 'clearTransactions' })
         table.previousPage()
+        updateTransactionIndex()
     }
 
     const nextPage = () => {
         dispatch({ type: 'clearTransactions' })
         table.nextPage()
+        updateTransactionIndex()
     }
 
     /*if (! (dataQuery.data )) {
