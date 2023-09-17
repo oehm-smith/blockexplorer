@@ -50,6 +50,11 @@ export const AppReducer = (state, action) => {
                 ...state,
                 transactions: []
             }
+        case 'setSelectedTransactions':
+            return {
+                ...state,
+                selectedTransaction: action.payload
+            }
         default:
             return state
     }

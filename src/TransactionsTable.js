@@ -195,7 +195,7 @@ export function TransactionsTableRender({ columns, inputData }) {
         const items = id.split('_');
         const name = items[items.length - 1]
         switch (name) {
-            case 'transactions':
+            case 'transactionNumber':
                 return true
             default:
                 return false
@@ -205,8 +205,8 @@ export function TransactionsTableRender({ columns, inputData }) {
         const items = cell.id.split('_');
         const name = items[items.length - 1]
         switch (name) {
-            case 'transactions':
-                dispatch({ type: 'setBlockTransactions', payload: cell.getValue() })
+            case 'transactionNumber':
+                dispatch({ type: 'setSelectedTransactions', payload: cell.getValue() })
             default:
                 return undefined
         }
@@ -427,7 +427,7 @@ export function TransactionsTable() {   //{ transactions }) {
 
     if (state.blockTransactions.length === 0) {
         return (
-            <>NO transactions yet</>
+            <>Click #transactions on Latest Blocks</>
         )
     }
     return (

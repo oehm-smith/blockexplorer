@@ -4,5 +4,6 @@ export const AppInitialState = {
     blocks: [],
     transactions: [],
     blockTransactions: [],
-    maxNumberBlocks: 10     // to display
+    maxNumberBlocks: 10,     // to display
+    selectedTransaction: undefined
 }

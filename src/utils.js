@@ -64,3 +64,10 @@ export const succinctise = input => {
 }
 
 export const hexToDecimal = hex => parseInt(hex, 16)
+
+export const printHexField = field => {
+    if (field && field._hex) {
+        return hexToDecimal(field._hex)
+    }
+    return null
+}

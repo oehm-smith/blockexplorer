@@ -7,6 +7,7 @@ import { Blocks } from "./Blocks"
 import { AppReducer } from "./AppReducer"
 import { AppInitialState } from "./AppInitialState"
 import { Transactions } from "./Transactions"
+import {Transaction} from "./Transaction";
 
 // In this week's lessons we used ethers.js. Here we are using the
 // Alchemy SDK is an umbrella library with several different packages.
@@ -57,13 +58,13 @@ function App() {
         <DispatchContext.Provider value={ dispatch }>
             <StateContext.Provider value={ state }>
                 <div className="wrapper">
-                    <div className="box header">Header</div>
+                    <div className="box header">Blockscan by Brooke</div>
                     {/*<div className="box sidebar">Not using at the moment</div>*/}
                     <div className="box content1"><Blocks/></div>
                     {/*<div className="box sidebar2">Not using at the moment</div>*/}
-                    <div className="box content2"><Transactions/>
-                    </div>
-                    <div className="box footer">Footer</div>
+                    <div className="box content2"><Transactions/></div>
+                    <div className="box content3"><Transaction/></div>
+                    <div className="box footer">Blockscan</div>
                 </div>
             </StateContext.Provider>
         </DispatchContext.Provider>
