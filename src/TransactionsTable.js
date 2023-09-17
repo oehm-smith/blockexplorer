@@ -171,7 +171,7 @@ export function TransactionsTableRender({ columns, inputData }) {
             pageIndexRef.current = table.getState().pagination.pageIndex
         }
     }, [table.getState().pagination])
-    
+
     const cellAlignment = (id) => {
         const items = id.split('_');
         const name = items[items.length - 1]
@@ -323,7 +323,7 @@ export function TransactionsTableRender({ columns, inputData }) {
                 </button>
                 <button
                     className="border rounded p-1"
-                    onClick={() => table.previousPage()}
+                    onClick={() => previousPage()}
                     disabled={!table.getCanPreviousPage()}
                 >
                     {'<'}
