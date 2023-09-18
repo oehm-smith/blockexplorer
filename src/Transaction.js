@@ -5,13 +5,22 @@ import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from "@t
 import {Utils} from "alchemy-sdk";
 
 function TransactionTableRender({columns, data}) {
-    // const table = useReactTable({
+    const dispatch = useContext(DispatchContext);
+// const table = useReactTable({
     //     data,
     //     columns,
     //     getCoreRowModel: getCoreRowModel(),
     // })
 
-    const hasClickHandler = () => {
+    const hasClickHandler = (id) => {
+        const items = id.split('_');
+        const name = items[items.length - 1].toLowerCase()
+
+        switch (name) {
+            case 'to':
+            case 'from':
+                return true;
+        }
         return false;
     }
 
@@ -31,8 +40,14 @@ function TransactionTableRender({columns, data}) {
         }
     }
 
-    const onClickField = (cell) => {
-        // NOP - and will never be called    
+    const onClickHandler = (name, value) => {
+        switch (name.toLowerCase()) {
+            case 'to':
+            case 'from':
+                dispatch({type: 'setAddressToLookup', payload: value})
+            default:
+                return undefined
+        }
     }
 
     return (
@@ -48,6 +63,18 @@ function TransactionTableRender({columns, data}) {
                 <tbody>
                 {data.map(d => {
                     const key = Object.keys(d)[0]
+                    if (hasClickHandler(key)) {
+                        return (
+                            <tr key={key}>
+                                <td className="Align-right">{key}</td>
+                                <td className="Align-left">
+                                    <button onClick={() => onClickHandler(key, d[key])}>
+                                        {d[key]}
+                                    </button>
+                                </td>
+                            </tr>
+                        )
+                    }
                     return (
                         <tr key={key}>
                             <td className="Align-right">{key}</td>

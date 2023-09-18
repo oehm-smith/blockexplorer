@@ -26,8 +26,13 @@ export function WalletLookup({columns, data}) {
     }
 
     useEffect(() => {
-        lookup();
-    })
+        setWalletAddr(state.addressToLookup)
+        lookup()
+    }, [state.addressToLookup])
+
+    // useEffect(() => {
+    //     lookup();
+    // })
 
     return (
         <div className="walletLookup">

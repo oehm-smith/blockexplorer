@@ -5,5 +5,6 @@ export const AppInitialState = {
     transactions: [],
     blockTransactions: [],
     maxNumberBlocks: 10,     // to display
-    selectedTransaction: undefined
+    selectedTransaction: undefined,
+    addressToLookup: undefined
 }

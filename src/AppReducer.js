@@ -55,6 +55,11 @@ export const AppReducer = (state, action) => {
                 ...state,
                 selectedTransaction: action.payload
             }
+        case 'setAddressToLookup':
+            return {
+                ...state,
+                addressToLookup: action.payload
+            }
         default:
             return state
     }
