@@ -58,6 +58,8 @@ export function TransactionsTableRender({columns, inputData}) {
 
     useEffect(() => {
         console.log(`useEffect for state.blockTransactions - length: ${state.blockTransactions.length}`)
+        // When select a new blockTransactions want to start at zero
+        setPagination({pageIndex, pageSize, transactionIndex: 0})
         //     setTrxGenerator(async () => {
         //         console.log(`getNext`)
         //         return [await alchemy.transact.getTransaction("0x55be2d4dea9f7d324f0c64ebbd6f62281a434302076570c1db2d0283a7d92a28")]
