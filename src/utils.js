@@ -75,5 +75,7 @@ export const printHexField = field => {
 }
 
 export const printEth = (wei) => {
-    return Utils.formatEther(wei) + " Eth"
+    if (wei) {
+        return Utils.formatEther(wei) + " Eth"
+    }
 }
