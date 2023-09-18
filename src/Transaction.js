@@ -93,8 +93,13 @@ export function Transaction() {
     const state = useContext(StateContext);
     const dispatch = useContext(DispatchContext);
 
-    if (state.selectedTransaction) {
+    if (state.selectedTransaction != null) {
         const tx = state.transactions[state.selectedTransaction]
+        if (!tx) {
+            return (
+                <>Error looking up transaction: {state.selectedTransaction}</>
+            )
+        }
         const data = [
             {To: tx.to},
             {From: tx.from},
