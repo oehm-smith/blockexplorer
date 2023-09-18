@@ -56,7 +56,7 @@ export function BlocksTableRender({ columns, data }) {
     */
     return (
         <div className="p-2">
-            <table>
+            <table className="blocksTable">
                 <thead>
                     {table.getHeaderGroups().map(headerGroup => (
                         <tr key={headerGroup.id}>

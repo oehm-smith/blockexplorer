@@ -38,7 +38,7 @@ function TransactionTableRender({columns, data}) {
     return (
         <div>
             <h4>Transaction</h4>
-            <table className="styled-table">
+            <table className="styled-table transactionTable">
                 <thead>
                 <tr>
                     <th>Field</th>

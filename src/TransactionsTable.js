@@ -255,7 +255,7 @@ export function TransactionsTableRender({ columns, inputData }) {
 
     return (
         <div className="p-2">
-            <table>
+            <table className="transactionsTable">
                 <thead>
                     {table.getHeaderGroups().map(headerGroup => (
                         <tr key={headerGroup.id}>

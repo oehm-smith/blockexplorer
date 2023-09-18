@@ -195,10 +195,27 @@ tfoot th {
 }
 
 .walletLookup {
-  width: 80%;
+  width: 100%;
   border: 1px;
 }
 
 .walletLookup input {
   width: 50%;
+}
+
+.tdTitle {
+  background-color: #009879;
+  color: #ffffff;
+}
+
+.walletLookupInput, .walletLookupTable, .transactionTable {
+  width: 60%
+}
+
+Input {
+  width: 50%;
+}
+
+.transactionsTable, .blocksTable {
+  width: 80%;
 }

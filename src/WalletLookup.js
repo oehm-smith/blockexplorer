@@ -1,12 +1,13 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {DispatchContext, StateContext} from "./AppContext";
 import {hexToDecimal, printHexField, succinctise} from "./utils";
 import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from "@tanstack/react-table";
 import {Alchemy} from "alchemy-sdk";
-const { Utils } = require("alchemy-sdk");
+
+const {Utils} = require("alchemy-sdk");
 
 export function WalletLookup({columns, data}) {
-    const [walletAddr, setWalletAddr] = useState('bbos.eth')
+    const [walletAddr, setWalletAddr] = useState('vitalik.eth')
     const [balance, setBalance] = useState(0)
     const [transactionsSent, setTransactionsSent] = useState(0)
 
@@ -23,13 +24,29 @@ export function WalletLookup({columns, data}) {
             console.error(`getBalance Error - ` + e)
         }
     }
+
+    useEffect(() => {
+        lookup();
+    })
+
     return (
         <div className="walletLookup">
             <h4>Wallet Lookup</h4>
-            <input type="text" name="walletAddress" value={walletAddr} onChange={e => setWalletAddr(e.target.value)}/>
-            <button type="button" onClick={() => lookup()}>Lookup</button>
-            <p>Value of wallet: {balance} Eth</p>
-            <p>Transactions sent from wallet: {transactionsSent}</p>
-        </div>
-    )
+            <div className="walletLookupInput">
+                <input type="text" name="walletAddress" value={walletAddr} onChange={e => setWalletAddr(e.target.value)}/>
+                <button type="button" onClick={() => lookup()}>Lookup</button>
+            </div>
+            <table className="styled-table walletLookupTable">
+                <tbody>
+                <tr key="value">
+                    <td className="Align-right tdTitle">Value of wallet</td>
+                    <td className="Align-left">{balance} Eth</td>
+                </tr>
+                <tr key="transactionsSent">
+                    <td className="Align-right tdTitle">Transactions sent from wallet</td>
+                    <td className="Align-left">{transactionsSent}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>)
 }
