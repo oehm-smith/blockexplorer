@@ -3,10 +3,10 @@ import {
     createColumnHelper, flexRender, getCoreRowModel, useReactTable, PaginationState,
     ColumnDef
 } from "@tanstack/react-table"
-import { DispatchContext, StateContext } from "./AppContext"
-import { age, hexToDecimal, numberFormat, succinctise } from "./utils"
-import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
-import { Alchemy } from "alchemy-sdk"
+import {DispatchContext, StateContext} from "./AppContext"
+import {age, hexToDecimal, numberFormat, succinctise} from "./utils"
+import {QueryClient, QueryClientProvider, useQuery} from '@tanstack/react-query'
+import {Alchemy} from "alchemy-sdk"
 
 /**
  *
@@ -32,18 +32,18 @@ function getFetchData(data) {
 
 const queryClient = new QueryClient()
 
-export function TransactionsTableRender({ columns, inputData }) {
+export function TransactionsTableRender({columns, inputData}) {
     const state = useContext(StateContext);
     const dispatch = useContext(DispatchContext);
 
     const alchemy = new Alchemy(state.settings);
 
-    const [{ pageIndex, pageSize, transactionIndex }, setPagination] =
-    React.useState ({
-        pageIndex: 0,
-        pageSize: 10,
-        transactionIndex: 0
-    })
+    const [{pageIndex, pageSize, transactionIndex}, setPagination] =
+        React.useState({
+            pageIndex: 0,
+            pageSize: 10,
+            transactionIndex: 0
+        })
     const pageIndexRef = useRef();  // save the previous value of pageIndex
 
     // function usePrevious(value) {
@@ -58,11 +58,11 @@ export function TransactionsTableRender({ columns, inputData }) {
 
     useEffect(() => {
         console.log(`useEffect for state.blockTransactions - length: ${state.blockTransactions.length}`)
-    //     setTrxGenerator(async () => {
-    //         console.log(`getNext`)
-    //         return [await alchemy.transact.getTransaction("0x55be2d4dea9f7d324f0c64ebbd6f62281a434302076570c1db2d0283a7d92a28")]
-    //     })
-    //     // setTrxGenerator(getNext)
+        //     setTrxGenerator(async () => {
+        //         console.log(`getNext`)
+        //         return [await alchemy.transact.getTransaction("0x55be2d4dea9f7d324f0c64ebbd6f62281a434302076570c1db2d0283a7d92a28")]
+        //     })
+        //     // setTrxGenerator(getNext)
     }, [state.blockTransactions])
 
     const fetchDataOptions = {
@@ -206,7 +206,7 @@ export function TransactionsTableRender({ columns, inputData }) {
         const name = items[items.length - 1]
         switch (name) {
             case 'transactionNumber':
-                dispatch({ type: 'setSelectedTransactions', payload: cell.getValue() })
+                dispatch({type: 'setSelectedTransactions', payload: cell.getValue()})
             default:
                 return undefined
         }
@@ -219,19 +219,19 @@ export function TransactionsTableRender({ columns, inputData }) {
     }
 
     const setPageIndex = page => {
-        dispatch({ type: 'clearTransactions' })
+        dispatch({type: 'clearTransactions'})
         table.setPageIndex(page)
         updateTransactionIndex()
     }
 
     const previousPage = () => {
-        dispatch({ type: 'clearTransactions' })
+        dispatch({type: 'clearTransactions'})
         table.previousPage()
         updateTransactionIndex()
     }
 
     const nextPage = () => {
-        dispatch({ type: 'clearTransactions' })
+        dispatch({type: 'clearTransactions'})
         table.nextPage()
         updateTransactionIndex()
     }
@@ -257,60 +257,60 @@ export function TransactionsTableRender({ columns, inputData }) {
         <div className="p-2">
             <table className="transactionsTable">
                 <thead>
-                    {table.getHeaderGroups().map(headerGroup => (
-                        <tr key={headerGroup.id}>
-                            {headerGroup.headers.map(header => (
-                                <th key={header.id}>
-                                    {header.isPlaceholder
-                                        ? null
-                                        : flexRender(
-                                            header.column.columnDef.header,
-                                            header.getContext()
-                                        )}
-                                </th>
-                            ))}
-                        </tr>
-                    ))}
+                {table.getHeaderGroups().map(headerGroup => (
+                    <tr key={headerGroup.id}>
+                        {headerGroup.headers.map(header => (
+                            <th key={header.id}>
+                                {header.isPlaceholder
+                                    ? null
+                                    : flexRender(
+                                        header.column.columnDef.header,
+                                        header.getContext()
+                                    )}
+                            </th>
+                        ))}
+                    </tr>
+                ))}
                 </thead>
                 <tbody>
-                    {table.getRowModel().rows.map(row => (
-                        <tr key={row.id}>
-                            {row.getVisibleCells().map(cell => {
-                                if (hasClickHandler(cell.id)) {
-                                    return (
-                                        <td key={cell.id} className={cellAlignment(cell.id)}>
-                                            <button onClick={() => onClickHandler(cell)}>
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                            </button>
-                                        </td>
-                                    )
-                                } else {
-                                    return (
-                                        <td key={cell.id} className={cellAlignment(cell.id)}>
+                {table.getRowModel().rows.map(row => (
+                    <tr key={row.id}>
+                        {row.getVisibleCells().map(cell => {
+                            if (hasClickHandler(cell.id)) {
+                                return (
+                                    <td key={cell.id} className={cellAlignment(cell.id)}>
+                                        <button onClick={() => onClickHandler(cell)}>
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </td>
-                                    )
+                                        </button>
+                                    </td>
+                                )
+                            } else {
+                                return (
+                                    <td key={cell.id} className={cellAlignment(cell.id)}>
+                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                    </td>
+                                )
 
-                                }
-                            })}
-                        </tr>
-                    ))}
+                            }
+                        })}
+                    </tr>
+                ))}
                 </tbody>
                 <tfoot>
-                    {table.getFooterGroups().map(footerGroup => (
-                        <tr key={footerGroup.id}>
-                            {footerGroup.headers.map(header => (
-                                <th key={header.id}>
-                                    {header.isPlaceholder
-                                        ? null
-                                        : flexRender(
-                                            header.column.columnDef.footer,
-                                            header.getContext()
-                                        )}
-                                </th>
-                            ))}
-                        </tr>
-                    ))}
+                {table.getFooterGroups().map(footerGroup => (
+                    <tr key={footerGroup.id}>
+                        {footerGroup.headers.map(header => (
+                            <th key={header.id}>
+                                {header.isPlaceholder
+                                    ? null
+                                    : flexRender(
+                                        header.column.columnDef.footer,
+                                        header.getContext()
+                                    )}
+                            </th>
+                        ))}
+                    </tr>
+                ))}
                 </tfoot>
             </table>
             <div className="h-2"/>
@@ -344,12 +344,12 @@ export function TransactionsTableRender({ columns, inputData }) {
                     {'>>'}
                 </button>
                 <span className="flex items-center gap-1">
-          <div>Page</div>
-          <strong>
-            {table.getState().pagination.pageIndex + 1} of{' '}
-              {table.getPageCount()}
-          </strong>
-        </span>
+                        <span>Page</span>
+                        <strong>
+                            {table.getState().pagination.pageIndex + 1} of{' '}
+                            {table.getPageCount()}
+                        </strong>
+                </span>
                 <span className="flex items-center gap-1">
           | Go to page:
           <input
@@ -375,9 +375,8 @@ export function TransactionsTableRender({ columns, inputData }) {
                         </option>
                     ))}
                 </select>
-                {dataQuery.isFetching ? 'Loading...' : null}
             </div>
-            <div>{table.getRowModel().rows.length} Rows</div>
+            <div>{table.getRowModel().rows.length} Rows {dataQuery.isFetching ? '(Loading...)' : null}</div>
         </div>
     )
 }
