@@ -4,7 +4,7 @@ import {
     ColumnDef
 } from "@tanstack/react-table"
 import {DispatchContext, StateContext} from "./AppContext"
-import {age, hexToDecimal, numberFormat, succinctise} from "./utils"
+import {age, hexToDecimal, numberFormat, printEth, succinctise} from "./utils"
 import {QueryClient, QueryClientProvider, useQuery} from '@tanstack/react-query'
 import {Alchemy} from "alchemy-sdk"
 
@@ -422,7 +422,7 @@ export function TransactionsTable() {   //{ transactions }) {
         }),
         columnHelper.accessor('value', {
             header: 'value',
-            cell: info => numberFormat(hexToDecimal(info.getValue()._hex))
+            cell: info => printEth(info.getValue())
         }),
     ]
 
