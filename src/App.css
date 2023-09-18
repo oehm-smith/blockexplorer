@@ -206,6 +206,7 @@ tfoot th {
 .tdTitle {
   background-color: #009879;
   color: #ffffff;
+  width: 50%;
 }
 
 .walletLookupInput, .walletLookupTable, .transactionTable {
