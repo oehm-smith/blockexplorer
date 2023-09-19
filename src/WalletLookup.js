@@ -30,10 +30,6 @@ export function WalletLookup({columns, data}) {
         lookup()
     }, [state.addressToLookup])
 
-    // useEffect(() => {
-    //     lookup();
-    // })
-
     return (
         <div className="walletLookup">
             <h4>Wallet Lookup</h4>

@@ -60,9 +60,7 @@ function App() {
             <StateContext.Provider value={ state }>
                 <div className="wrapper">
                     <div className="box header">Blockscan by Brooke</div>
-                    {/*<div className="box sidebar">Not using at the moment</div>*/}
                     <div className="box content1"><Blocks/></div>
-                    {/*<div className="box sidebar2">Not using at the moment</div>*/}
                     <div className="box content2"><Transactions/></div>
                     <div className="box content3"><Transaction/></div>
                     <div className="box content4"><WalletLookup/></div>

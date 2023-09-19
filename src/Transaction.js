@@ -6,11 +6,6 @@ import {Utils} from "alchemy-sdk";
 
 function TransactionTableRender({columns, data}) {
     const dispatch = useContext(DispatchContext);
-// const table = useReactTable({
-    //     data,
-    //     columns,
-    //     getCoreRowModel: getCoreRowModel(),
-    // })
 
     const hasClickHandler = (id) => {
         const items = id.split('_');
@@ -22,22 +17,6 @@ function TransactionTableRender({columns, data}) {
                 return true;
         }
         return false;
-    }
-
-    const cellAlignment = (id) => {
-        const items = id.split('_');
-        const name = items[items.length - 1]
-        const aligns = {
-            'gasLimit': 'right',
-            'gasUsed': 'right'
-        }
-        switch (name) {
-            case 'gasLimit':
-            case 'gasUsed':
-                return 'Align-' + aligns[name]
-            default:
-                return 'Align-left'
-        }
     }
 
     const onClickHandler = (name, value) => {
